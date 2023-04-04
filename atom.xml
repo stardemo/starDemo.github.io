@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://stardemo.github.io</id>
+    <title>Zone</title>
+    <updated>2023-04-04T03:26:29.221Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://stardemo.github.io"/>
+    <link rel="self" href="https://stardemo.github.io/atom.xml"/>
+    <subtitle>一个技术爱好者的备忘录</subtitle>
+    <logo>https://stardemo.github.io/images/avatar.png</logo>
+    <icon>https://stardemo.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2023, Zone</rights>
+    <entry>
+        <title type="html"><![CDATA[CentOS 7.6 3.10.x 内核下创建 memory cgroup 失败原因与解决方案]]></title>
+        <id>https://stardemo.github.io/post/centos-76-310x-nei-he-xia-chuang-jian-memory-cgroup-shi-bai-yuan-yin-yu-jie-jue-fang-an/</id>
+        <link href="https://stardemo.github.io/post/centos-76-310x-nei-he-xia-chuang-jian-memory-cgroup-shi-bai-yuan-yin-yu-jie-jue-fang-an/">
+        </link>
+        <updated>2023-04-04T03:24:13.000Z</updated>
+        <summary type="html"><![CDATA[<p>原文:  <a href="https://zhuanlan.zhihu.com/p/106757502">https://zhuanlan.zhihu.com/p/106757502</a></p>
+]]></summary>
+        <content type="html"><![CDATA[<p>原文:  <a href="https://zhuanlan.zhihu.com/p/106757502">https://zhuanlan.zhihu.com/p/106757502</a></p>
+<!-- more -->
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[kubectl根据Pod状态进行批量删除]]></title>
+        <id>https://stardemo.github.io/post/kubectl-gen-ju-pod-zhuang-tai-jin-xing-pi-liang-shan-chu/</id>
+        <link href="https://stardemo.github.io/post/kubectl-gen-ju-pod-zhuang-tai-jin-xing-pi-liang-shan-chu/">
+        </link>
+        <updated>2023-04-04T03:20:11.000Z</updated>
+        <content type="html"><![CDATA[<!-- more -->
+<p>Cmd:</p>
+<pre><code class="language-shell">kubectl get pods -A |grep ${podStatus} |awk '{printf(&quot;kubectl delete pods %s -n %s\n&quot;, $2,$1)}' | /bin/bash
+</code></pre>
+<p>Example:</p>
+<pre><code class="language-shell">kubectl get pods -A |grep UnexpectedAdmissionError |awk '{printf(&quot;kubectl delete pods %s -n %s\n&quot;, $2,$1)}' | /bin/bash
+</code></pre>
+<p>要删除成功的作业:</p>
+<pre><code class="language-shell">kubectl delete jobs --field-selector status.successful=1
+</code></pre>
+<p>删除失败或长时间运行的作业:</p>
+<pre><code class="language-shell">kubectl delete jobs --field-selector status.successful=0
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[如何通过PID定位是哪个容器]]></title>
+        <id>https://stardemo.github.io/post/ru-he-tong-guo-pid-ding-wei-shi-na-ge-rong-qi/</id>
+        <link href="https://stardemo.github.io/post/ru-he-tong-guo-pid-ding-wei-shi-na-ge-rong-qi/">
+        </link>
+        <updated>2022-10-26T02:59:54.000Z</updated>
+        <summary type="html"><![CDATA[<p>日常排查集群故障问题时会从宿主机上定位到进程PID但是需要定位到具体哪个容器的问题就步骤多了些 这边文章把方法总结一下</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>日常排查集群故障问题时会从宿主机上定位到进程PID但是需要定位到具体哪个容器的问题就步骤多了些 这边文章把方法总结一下</p>
+<!-- more -->
+<ul>
+<li>首先定位容器目录</li>
+</ul>
+<pre><code>pwdx PID
+# pwdx 681978
+# 681978: /
+</code></pre>
+<ul>
+<li>具体查询思路<br>
+通过<code>docker ps -q</code>命令，获取所有的容器<code>id</code>，再通过<code>xargs</code>管道，将这些容器<code>id</code>转交给<code>docker inspect</code>命令进行处理，通过<code>-f '{{.State.Pid}} {{.Config.Hostname}}'</code>参数，只打印出来容器当前的<code>pid</code>和容器<code>id</code></li>
+</ul>
+<pre><code>docker ps -q | xargs docker inspect -f '{{.State.Pid}} {{.Config.Hostname}}' | grep PID
+## 回显
+# PID container_ID
+## 查询容器
+# docker ps | grep container_ID
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[通过unshare探索Linux namespaces]]></title>
+        <id>https://stardemo.github.io/post/tong-guo-unshare-tan-suo-linux-namespaces/</id>
+        <link href="https://stardemo.github.io/post/tong-guo-unshare-tan-suo-linux-namespaces/">
+        </link>
+        <updated>2022-07-25T03:53:03.000Z</updated>
+        <summary type="html"><![CDATA[<p>unshare [options] program [arguments]</p>
+<ul>
+<li>run program with some namespaces unshared from parent(使用与父程序不共享的名称空间运行程序)</li>
+</ul>
+]]></summary>
+        <content type="html"><![CDATA[<p>unshare [options] program [arguments]</p>
+<ul>
+<li>run program with some namespaces unshared from parent(使用与父程序不共享的名称空间运行程序)</li>
+</ul>
+<!-- more -->
+<h2 id="unshare-命令描述">unshare 命令描述</h2>
+<p><code>Unshares the indicated namespaces from the parent process and then executes the specified program. The namespaces to be unshared are indicated via options. </code><br>
+Unshare取消共享父进程中指定的命名空间，然后执行指定的程序。要取消共享的命名空间通过选项来指示。不可共享的命名空间有</p>
+<h2 id="支持设置的namespace">支持设置的namespace</h2>
+<ul>
+<li>mount namespace</li>
+<li>UTS namespace</li>
+<li>IPC namespace</li>
+<li>network namespace</li>
+<li>pid namespace</li>
+<li>user namespace</li>
+</ul>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a href="https://blog.csdn.net/qq_34939308/article/details/114115443?spm=1001.2101.3001.6650.5&amp;utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-5-114115443-blog-116682761.pc_relevant_multi_platform_whitelistv3&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-5-114115443-blog-116682761.pc_relevant_multi_platform_whitelistv3&amp;utm_relevant_index=7">unshare命令详解及案例</a></li>
+<li><a href="https://www.cnblogs.com/dream397/p/13996275.html">cnblogs unshare介绍</a></li>
+<li><a href="https://blog.csdn.net/weixin_42525428/article/details/116682761">linux unshare 命令,Linux ip netns 命令</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[K8s 常用 Ingress 使用技巧]]></title>
+        <id>https://stardemo.github.io/post/k8s-chang-yong-ingress-shi-yong-ji-qiao/</id>
+        <link href="https://stardemo.github.io/post/k8s-chang-yong-ingress-shi-yong-ji-qiao/">
+        </link>
+        <updated>2022-07-13T03:02:45.000Z</updated>
+        <summary type="html"><![CDATA[<ul>
+<li>Traefik</li>
+<li>Ingress Nginx</li>
+</ul>
+]]></summary>
+        <content type="html"><![CDATA[<ul>
+<li>Traefik</li>
+<li>Ingress Nginx</li>
+</ul>
+<!-- more -->
+<h2 id="annotations">Annotations</h2>
+<p>annotations作为k8s资源常见的一个声明配置方式 在Ingress资源对象里可以很方便的进行一些规则配置。</p>
+<ul>
+<li>Traefik 1.7     <a href="https://doc.traefik.io/traefik/v1.7/configuration/backends/kubernetes/#annotations">官方文档</a></li>
+<li>Traefik 2.0+    <a href="https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/#annotations">官方文档</a></li>
+<li>Ingress Nginx     <a href="https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/">官方文档</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ eStargz 的延迟拉取]]></title>
+        <id>https://stardemo.github.io/post/estargz-de-yan-chi-la-qu/</id>
+        <link href="https://stardemo.github.io/post/estargz-de-yan-chi-la-qu/">
+        </link>
+        <updated>2022-07-12T02:35:50.000Z</updated>
+        <summary type="html"><![CDATA[<p>根据<a href="https://docs.rancher.cn/docs/k3s/advanced/_index#%E4%BB%80%E4%B9%88%E6%98%AF%E5%BB%B6%E8%BF%9F%E6%8B%89%E5%8F%96%E5%92%8C-estargz%EF%BC%9F"> Rancehr文档-配置 k3s 进行 eStargz 的延迟拉取</a>学习研究<br>
+什么是延迟拉取和 eStargz？</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>根据<a href="https://docs.rancher.cn/docs/k3s/advanced/_index#%E4%BB%80%E4%B9%88%E6%98%AF%E5%BB%B6%E8%BF%9F%E6%8B%89%E5%8F%96%E5%92%8C-estargz%EF%BC%9F"> Rancehr文档-配置 k3s 进行 eStargz 的延迟拉取</a>学习研究<br>
+什么是延迟拉取和 eStargz？</p>
+<!-- more -->
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[golang中的反射解析结构体标签tag]]></title>
+        <id>https://stardemo.github.io/post/golang-zhong-de-fan-she-jie-xi-jie-gou-ti-biao-qian-tag/</id>
+        <link href="https://stardemo.github.io/post/golang-zhong-de-fan-she-jie-xi-jie-gou-ti-biao-qian-tag/">
+        </link>
+        <updated>2022-02-25T07:24:14.000Z</updated>
+        <summary type="html"><![CDATA[<p>项目中用到的一个需求，查询记录备忘</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>项目中用到的一个需求，查询记录备忘</p>
+<!-- more -->
+<pre><code class="language-golang">package main
+ 
+import (
+    &quot;fmt&quot;
+    &quot;reflect&quot;
+)
+ 
+type resume struct {
+    // 反射解析结构体标签tag
+    Name string `info:&quot;name&quot; doc:&quot;我的名字&quot;`
+    Sex string `info:&quot;sex&quot;`
+}
+// 方法一：传递结构体对象
+func findTag(stru interface{}) {
+    t := reflect.TypeOf(stru)
+    for i := 0; i &lt; t.NumField(); i++ {
+        fmt.Println(&quot;info：&quot;, t.Field(i).Tag.Get(&quot;info&quot;), &quot;doc：&quot;, t.Field(i).Tag.Get(&quot;doc&quot;))
+    }
+}
+// 方法二：传递结构体指针
+func findTag2(struc interface{}) {
+    t := reflect.TypeOf(struc).Elem()
+    for i := 0; i &lt; t.NumField(); i++ {
+        fmt.Printf(&quot;info: %s, doc: %s\n&quot;, t.Field(i).Tag.Get(&quot;info&quot;), t.Field(i).Tag.Get(&quot;doc&quot;))
+    }
+}
+ 
+func main() {
+    r := resume{Name: &quot;mayanan&quot;, Sex: &quot;男&quot;}
+    // 方法一：传递结构体对象
+    findTag(r)
+    // 方法二：传递结构体指针
+    findTag2(&amp;r)
+}
+</code></pre>
+<p>出处: <a href="https://www.cnblogs.com/mayanan/p/15484309.html">https://www.cnblogs.com/mayanan/p/15484309.html</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[MYSQL insert ignore、insert和replace区别]]></title>
+        <id>https://stardemo.github.io/post/mysql-insert-ignoreinsert-he-replace-qu-bie/</id>
+        <link href="https://stardemo.github.io/post/mysql-insert-ignoreinsert-he-replace-qu-bie/">
+        </link>
+        <updated>2022-02-23T15:15:51.000Z</updated>
+        <content type="html"><![CDATA[<!-- more -->
+<table>
+<thead>
+<tr>
+<th style="text-align:center">指令</th>
+<th style="text-align:center">已经存在</th>
+<th style="text-align:center">不存在</th>
+<th style="text-align:center">举例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">insert</td>
+<td style="text-align:center">报错</td>
+<td style="text-align:center">插入</td>
+<td style="text-align:center">insert into names(name, age) values(“小明”, 23);</td>
+</tr>
+<tr>
+<td style="text-align:center">insert ignore</td>
+<td style="text-align:center">忽略</td>
+<td style="text-align:center">插入</td>
+<td style="text-align:center">insert ignore into names(name, age) values(“小明”, 24);</td>
+</tr>
+<tr>
+<td style="text-align:center">replace</td>
+<td style="text-align:center">替换</td>
+<td style="text-align:center">插入</td>
+<td style="text-align:center">replace into names(name, age) values(“小明”, 25);</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>要求：表有PrimaryKey或者unique索引</li>
+<li>结果：表id都会自增</li>
+</ul>
+<p><em><strong><a href="https://blog.csdn.net/mouday/article/details/81281946">学习转载自:https://blog.csdn.net/mouday/article/details/81281946</a></strong></em></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Kubernetes NetworkPolicy]]></title>
+        <id>https://stardemo.github.io/post/kubernetes-networkpolicy/</id>
+        <link href="https://stardemo.github.io/post/kubernetes-networkpolicy/">
+        </link>
+        <updated>2022-02-09T03:23:29.000Z</updated>
+        <summary type="html"><![CDATA[<p>Kubernetes通过namespace支持了多租户，不同租户间可以通过ResourceQuota来保证资源的隔离，也无法查看其他namespace的Pod信息等。但默认kubernetes并不限制访问Pod的网络请求，对于一些敏感的应用来说可能不够用。</p>
+<p>Refer: <a href="https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/">Offical Docs</a></p>
+]]></summary>
+        <content type="html"><![CDATA[<p>Kubernetes通过namespace支持了多租户，不同租户间可以通过ResourceQuota来保证资源的隔离，也无法查看其他namespace的Pod信息等。但默认kubernetes并不限制访问Pod的网络请求，对于一些敏感的应用来说可能不够用。</p>
+<p>Refer: <a href="https://kubernetes.io/zh/docs/concepts/services-networking/network-policies/">Offical Docs</a></p>
+<!-- more -->
+<h2 id="前置条件">前置条件</h2>
+<p>网络策略通过<a href="https://kubernetes.io/zh/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/">网络插件</a> 来实现。要使用网络策略，你必须使用支持<code>NetworkPolicy</code>的网络解决方案。 创建一个 <code>NetworkPolicy </code>资源对象而没有控制器来使它生效的话，是没有任何作用的。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Golang Protobuf学习记录]]></title>
+        <id>https://stardemo.github.io/post/golang-protobuf-xue-xi-ji-lu/</id>
+        <link href="https://stardemo.github.io/post/golang-protobuf-xue-xi-ji-lu/">
+        </link>
+        <updated>2022-02-07T09:20:43.000Z</updated>
+        <summary type="html"><![CDATA[<p>使用Golang 实践protobuf</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>使用Golang 实践protobuf</p>
+<!-- more -->
+<p>https://geektutu.com/post/quick-go-protobuf.html</p>
+]]></content>
+    </entry>
+</feed>
